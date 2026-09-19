@@ -1,0 +1,27 @@
+name: Build Ozen SMS Bridge APK
+on:
+  push:
+    branches: [ build-ozen-sms-bridge ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build debug APK
+        working-directory: android/OzenSmsBridge
+        run: gradle --no-daemon assembleDebug
+      - name: Collect APK
+        run: cp android/OzenSmsBridge/app/build/outputs/apk/debug/app-debug.apk OzenSmsBridge.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OzenSmsBridge-APK
+          path: OzenSmsBridge.apk
+          if-no-files-found: error
